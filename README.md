@@ -1,21 +1,44 @@
-# ROBLOX Proxy API service
+# rprxy
 
-## About
+Because ROBLOX does not allow HttpService requests to roblox.com an external proxy is needed for access to site APIs.
+This will proxy all requests to ROBLOX via `server.js` except when the path is `/proxy` and a static file exists.
 
-ROBLOX web APIs are not accessible via HttpService within ROBLOX, so this site exists as a way to access some of those APIs via proxy. A list of all ROBLOX web APIs can be found [here](http://wiki.roblox.com/index.php?title=Web_APIs). Currently though, this only supports one [API method](http://wiki.roblox.com/index.php?title=Web_APIs#Get_AssetIds_being_worn_by_a_user), with plans for great expansion! If you have a particular API method you would like me to support, shoot me a PM [on ROBLOX](https://www.roblox.com/users/7020663/profile).
+A limited number of APIs are available via the `/proxy/api` path via `api.js`.
 
-## Setup
+## Installation
 
-Make sure you have npm and node installed, then download the project. Cd into it and run `npm install` then `npm start`. Open up your browser to `localhost:3131` and you should see a similar readme to this one.
+Simply clone the project and type `npm install` when in the folder to install all dependencies. You can now start the server with `node server.js`.
 
-## Use
+The default configuration does not have to be changed for a working server and it will automatically work with any subdomain your DNS supports.
 
-This site is currently hosted on my site, [here](http://rbxproxy.blakemealey.ca), where you can use it as long as you don't expect it to scale.
+## Configuration
 
-In order to use the API, make a GET request to:
+The only configuration files you may want to edit are `blocked.json` and `re_blocked.json`.
+All paths that match any in `blocked.json` _exactly_ will be blocked. If you want to match with regex, which can also be used for partial matching, add the pattern to `re_blocked.json`. If _anything matches at all_ the URL will be blocked.
 
-`http://rbxproxy.blakemealey.ca/api/{ROBLOX_API_REQUEST}`
+There are a few settings you can change directly in the `server.js` file. If `serveHomepage` is `true` the rprxy home page will be at the root of the domain. If `serveHomepageOnAllSubdomains` is `true` this will apply to all subdomains, otherwise it will only apply to the root domain.
 
-Where `ROBLOX_API_REQUEST` is the remaining part of the ROBLOX API request after `http://www.roblox.com`.
+If you have your own domain point all the subdomains you need at the server and it will work automatically when you visit those subdomains on your own site.
+If you are not able to add subdomains for any reason (usually if you just don't have a domain name) you can set `subdomainsAsPath` to `true` in the `server.js` file.
+When this is enabled you can request a specific subdomain by using it first in the path (see the examples below).
 
-I.e. for `http://www.roblox.com/Asset/AvatarAccoutrements.ashx?userId=261`, the request would be `http://rbxproxy.blakemealey.ca/api/Asset/AvatarAccoutrements.ashx?userId=261`
+## Examples
+In every example the main domain is `rprxy.xyz`.
+
+To search the catalog (search subdomain):  
+[https://search.rprxy.xyz/catalog/json](#)
+
+If you have `subdomainsAsPath` enabled:  
+[https://rprxy.xyz/search/catalog/json](#)
+
+Get recommended username (no subdomain):  
+[https://rprxy.xyz/UserCheck/GetRecommendedUsername?usernameToTry=Froast]()
+
+If you have `subdomainsAsPath` enabled:  
+[https://rprxy.xyz/www/UserCheck/GetRecommendedUsername?usernameToTry=Froast]()
+
+Having no subdomain is the same as having a www subdomain, below is exactly the same:  
+[https://www.rprxy.xyz/UserCheck/GetRecommendedUsername?usernameToTry=Froast]()
+
+If you have `subdomainsAsPath` enabled it doesn't matter what the actual subdomain is:  
+[https://www.rprxy.xyz/www/UserCheck/GetRecommendedUsername?usernameToTry=Froast]()
